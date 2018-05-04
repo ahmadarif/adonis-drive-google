@@ -1,0 +1,16 @@
+language: node_js
+node_js:
+- 8.9.1
+sudo: false
+install:
+- npm install
+script:
+- npm test
+deploy:
+  provider: npm
+  email: ahmad.arif019@gmail.com
+  api_key:
+    secure: OPHEsacFsOJdYGOgZed/45/4NU0Q42e0htz8ueXutWu1Xg+F3KDhLpIHGv8QRtMS7UBNpOrhwDpc4KqvsYcGHPQmw92EyMa/51kMGzQYqxVOqNa1ESjT48QeviNcrWRpjikWh4Wszdll3CL08CLgcQOGw8Y6SumT0nC3xgYhx31NvklW324sdy2CYsgTlqLY/g/yGue/DKTxnj00yaYYJTSgoicZtmMp0A++JRgEq2RrwLZ5NVQALbprpKxX88knFlvs0VVQkNbpvr+0CzBCgE3P7xeOJZVrvU4SjOgqMALAIylvwy/HznwxzKEb64qIt8VzS3OnCStv6fLb5pxglkbY5qWp8KD7oSlNt1pVMHPmk7D1Vk32QHsCEONVHAVmN+iZqBnX87++ZhJAuib4+5GhqHITbSkMTc/M5M4CuXnzBL7ZL3J/Fdl1LzHodLxR4f4DQv7SygXXCDFIyKGNVQNoFX5szdv9SRxhPOnW4CiglvhhWFyX9nInes1IH1yzSqDRvtvh5Wz9nab74A9FkJr5tCA+ws61m77XkJSUWn/BRlFLVOWLNThBeYbhGdifud2dI8Z487boGMQkmszlYNVAxZGDt9xsFKe3KDhxSMpRow3jj5tc0sMTb5RqROQEVaThylOjC3dLYT+RNteieXzt6cwcPIgd6HT1XRtFaco=
+  on:
+    tags: true
+    repo: ahmadarif/adonis-drive-google
