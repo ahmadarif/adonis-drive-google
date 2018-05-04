@@ -1,6 +1,6 @@
 {
   "name": "adonis-drive-google",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Google Cloud Storage Driver for Adonis Drive",
   "scripts": {
     "test": "echo \"not tested\"",
