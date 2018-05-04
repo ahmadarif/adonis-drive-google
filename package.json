@@ -1,0 +1,66 @@
+{
+  "name": "adonis-drive-google",
+  "version": "0.0.1",
+  "description": "Google Cloud Storage Driver for Adonis Drive",
+  "scripts": {
+    "test": "echo \"not tested\"",
+    "coverage": "nyc npm test",
+    "lint": "standard",
+    "lint:fix": "standard --fix"
+  },
+  "keywords": [
+    "adonisjs",
+    "drive",
+    "google-cloud-storage",
+    "google",
+    "cloud",
+    "storage"
+  ],
+  "author": "Ahmad Arif <ahmad.arif019@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ahmadarif/adonis-drive-google.git"
+  },
+  "dependencies": {
+    "@google-cloud/storage": "^1.6.0"
+  },
+  "devDependencies": {
+    "@adonisjs/fold": "^4.0.8",
+    "husky": "^1.0.0-rc.1",
+    "standard": "^11.0.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm test"
+    }
+  },
+  "nyc": {
+    "exclude": [
+      "test"
+    ],
+    "reporter": [
+      "html",
+      "lcov",
+      "text",
+      "text-summary"
+    ]
+  },
+  "standard": {
+    "globals": [
+      "use"
+    ],
+    "ignore": [
+      ".nyc_output",
+      "coverage"
+    ]
+  },
+  "bugs": {
+    "url": "https://github.com/ahmadarif/adonis-drive-google/issues"
+  },
+  "homepage": "https://github.com/ahmadarif/adonis-drive-google#readme",
+  "main": "index.js",
+  "directories": {
+    "example": "examples"
+  }
+}
