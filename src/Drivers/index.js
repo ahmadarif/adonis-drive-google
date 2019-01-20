@@ -330,7 +330,7 @@ class GoogleStorage {
     const folders = paths.join("/");
 
     const dir = `${rootDir}/${folders}`;
-    const dest = `${dir}/${new Date().getTime()}-${file}`;
+    const dest = `${dir}/${file}`;
 
     // create dir if doesn't exists
     if (!fs.existsSync(dir)) fs.mkdirSync(dir);
