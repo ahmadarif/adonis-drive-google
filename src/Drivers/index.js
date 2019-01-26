@@ -1,9 +1,9 @@
-'use strict'
+"use strict";
 
-const Storage = require('@google-cloud/storage')
-const Resetable = require('resetable')
-const mime = require('mime-types')
-const fs = require('fs')
+const Storage = require("@google-cloud/storage");
+const Resetable = require("resetable");
+const mime = require("mime-types");
+const fs = require("fs");
 
 /**
  * Google cloud storage driver for flydrive
@@ -11,12 +11,12 @@ const fs = require('fs')
  * @class GoogleStorage
  */
 class GoogleStorage {
-  constructor (config) {
+  constructor(config) {
     this.storage = new Storage({
       keyFilename: config.keyFilename
-    })
+    });
 
-    this._bucket = new Resetable(config.bucket)
+    this._bucket = new Resetable(config.bucket);
   }
 
   /**
@@ -28,9 +28,9 @@ class GoogleStorage {
    *
    * @chainable
    */
-  bucket (bucket) {
-    this._bucket.set(bucket)
-    return this
+  bucket(bucket) {
+    this._bucket.set(bucket);
+    return this;
   }
 
   /**
@@ -43,20 +43,23 @@ class GoogleStorage {
    *
    * @return {Promise<Boolean>}
    */
-  exists (location) {
+  exists(location) {
     return new Promise((resolve, reject) => {
-      this.storage.bucket(this._bucket.pull()).file(location).exists({}, (error, exists) => {
-        if (error) return reject(error)
-        return resolve(exists)
-      })
-    })
+      this.storage
+        .bucket(this._bucket.pull())
+        .file(location)
+        .exists({}, (error, exists) => {
+          if (error) return reject(error);
+          return resolve(exists);
+        });
+    });
   }
 
   /**
    * Returns url for a given key. Note this method doesn't
    * validates the existence of file or it's visibility
    * status.
-   * 
+   *
    * @method getUrl
    *
    * @param {string} location
@@ -64,9 +67,9 @@ class GoogleStorage {
    *
    * @returns {string} File URL
    */
-  getUrl (location, bucket) {
-    bucket = bucket || this._bucket.pull()
-    return `https://storage.googleapis.com/${bucket}/${location}`
+  getUrl(location, bucket) {
+    bucket = bucket || this._bucket.pull();
+    return `https://storage.googleapis.com/${bucket}/${location}`;
   }
 
   /**
@@ -80,15 +83,18 @@ class GoogleStorage {
    *
    * @return {String}
    */
-  getSignedUrl (location, expiry) {
-    const options = { action: 'read', expires: expiry }
+  getSignedUrl(location, expiry) {
+    const options = { action: "read", expires: expiry };
 
     return new Promise((resolve, reject) => {
-      this.storage.bucket(this._bucket.pull()).file(location).getSignedUrl(options, (error, signedUrl) => {
-        if (error) return reject(error)
-        return resolve(signedUrl)
-      })
-    })
+      this.storage
+        .bucket(this._bucket.pull())
+        .file(location)
+        .getSignedUrl(options, (error, signedUrl) => {
+          if (error) return reject(error);
+          return resolve(signedUrl);
+        });
+    });
   }
 
   /**
@@ -103,18 +109,20 @@ class GoogleStorage {
    *
    * @return {Promise<String>} Public URL
    */
-  put (location, content, options = {}) {
+  put(location, content, options = {}) {
     const clonedOptions = Object.assign({}, options, {
       destination: location,
       contentType: mime.lookup(location)
-    })
+    });
 
     return new Promise((resolve, reject) => {
-      this.storage.bucket(this._bucket.pull()).upload(content, clonedOptions, (error) => {
-        if (error) return reject(error)
-        return resolve(this.getUrl(location, this._bucket.pull()))
-      })
-    })
+      this.storage
+        .bucket(this._bucket.pull())
+        .upload(content, clonedOptions, error => {
+          if (error) return reject(error);
+          return resolve(this.getUrl(location, this._bucket.pull()));
+        });
+    });
   }
 
   /**
@@ -127,13 +135,16 @@ class GoogleStorage {
    *
    * @return {Promise<Boolean>}
    */
-  delete (location) {
+  delete(location) {
     return new Promise((resolve, reject) => {
-      this.storage.bucket(this._bucket.pull()).file(location).delete({}, (error) => {
-        if (error) return reject(error)
-        return resolve(true)
-      })
-    })
+      this.storage
+        .bucket(this._bucket.pull())
+        .file(location)
+        .delete({}, error => {
+          if (error) return reject(error);
+          return resolve(true);
+        });
+    });
   }
 
   /**
@@ -150,24 +161,26 @@ class GoogleStorage {
    *
    * @return {Promise<String>}
    */
-  copy (src, dest, destBucket, options = {}) {
-    const bucket = this._bucket.pull()
-    destBucket = destBucket || bucket
+  copy(src, dest, destBucket, options = {}) {
+    const bucket = this._bucket.pull();
+    destBucket = destBucket || bucket;
 
     return new Promise((resolve, reject) => {
-      this.storage.bucket(bucket).file(src)
-        .copy(this.storage.bucket(destBucket).file(dest), options, (error) => {
-          if (error) return reject(error)
+      this.storage
+        .bucket(bucket)
+        .file(src)
+        .copy(this.storage.bucket(destBucket).file(dest), options, error => {
+          if (error) return reject(error);
 
           if (options.public === true) {
             return this.makePublic(dest)
               .then(data => resolve(this.getUrl(dest, destBucket)))
-              .catch(err => reject(err))
+              .catch(err => reject(err));
           } else {
-            return resolve(this.getUrl(dest, destBucket))
+            return resolve(this.getUrl(dest, destBucket));
           }
-        })
-    })
+        });
+    });
   }
 
   /**
@@ -185,28 +198,34 @@ class GoogleStorage {
    *
    * @return {Promise<String>}
    */
-  move (src, dest, destBucket, options = {}) {
-    const bucket = this._bucket.pull()
-    destBucket = destBucket || bucket
+  move(src, dest, destBucket, options = {}) {
+    const bucket = this._bucket.pull();
+    destBucket = destBucket || bucket;
 
     return new Promise((resolve, reject) => {
-      this.storage.bucket(bucket).file(src)
-        .move(this.storage.bucket(destBucket).file(dest), options, (error, result) => {
-          if (error) return reject(error)
-          
-          if (options.public === true) {
-            return this.makePublic(dest)
-              .then(data => resolve(this.getUrl(dest, destBucket)))
-              .catch(err => reject(err))
-          } else {
-            return resolve(this.getUrl(dest, destBucket))
+      this.storage
+        .bucket(bucket)
+        .file(src)
+        .move(
+          this.storage.bucket(destBucket).file(dest),
+          options,
+          (error, result) => {
+            if (error) return reject(error);
+
+            if (options.public === true) {
+              return this.makePublic(dest)
+                .then(data => resolve(this.getUrl(dest, destBucket)))
+                .catch(err => reject(err));
+            } else {
+              return resolve(this.getUrl(dest, destBucket));
+            }
           }
-        })
-    })
+        );
+    });
   }
 
   /**
-   * Set a file to be publicly readable and maintain all previous 
+   * Set a file to be publicly readable and maintain all previous
    * permissions.
    *
    * @method makePublic
@@ -216,18 +235,20 @@ class GoogleStorage {
    *
    * @return {Promise<Boolean>}
    */
-  makePublic (location) {
+  makePublic(location) {
     return new Promise((resolve, reject) => {
-      this.storage.bucket(this._bucket.pull()).file(location)
+      this.storage
+        .bucket(this._bucket.pull())
+        .file(location)
         .makePublic((error, result) => {
-          if (error) return reject(error)
-          return resolve(true)
-        })
-    })
+          if (error) return reject(error);
+          return resolve(true);
+        });
+    });
   }
 
   /**
-   * Make a file private to the project and remove all other permissions. 
+   * Make a file private to the project and remove all other permissions.
    * Set options.strict to true to make the file private to only the owner.
    *
    * @method makePrivate
@@ -237,19 +258,21 @@ class GoogleStorage {
    *
    * @return {Promise<Boolean>}
    */
-  makePrivate (location) {
+  makePrivate(location) {
     return new Promise((resolve, reject) => {
-      this.storage.bucket(this._bucket.pull()).file(location)
+      this.storage
+        .bucket(this._bucket.pull())
+        .file(location)
         .makePrivate({}, (error, result) => {
-          if (error) return reject(error)
-          return resolve(true)
-        })
-    })
+          if (error) return reject(error);
+          return resolve(true);
+        });
+    });
   }
 
   /**
-   * Create a readable stream to read the contents of the remote file. 
-   * It can be piped to a writable stream or listened to for 'data' 
+   * Create a readable stream to read the contents of the remote file.
+   * It can be piped to a writable stream or listened to for 'data'
    * events to read a file's contents.
    *
    * @method getStream
@@ -258,56 +281,70 @@ class GoogleStorage {
    *
    * @return {Stream}
    */
-  getStream (location) {
-    return this.storage.bucket(this._bucket.pull()).file(location).createReadStream()
+  getStream(location) {
+    return this.storage
+      .bucket(this._bucket.pull())
+      .file(location)
+      .createReadStream();
   }
 
   /**
    * Get a file object and its metadata if it exists.
-   * 
+   *
    * @method getObject
    * @async
-   * 
+   *
    * @param {String} location
-   * 
+   *
    * @returns {Promise<Object>}
    */
-  getObject (location) {
+  getObject(location) {
     return new Promise((resolve, reject) => {
-      this.storage.bucket(this._bucket.pull()).file(location)
+      this.storage
+        .bucket(this._bucket.pull())
+        .file(location)
         .get({}, (error, file, apiResponse) => {
-          if (error) return reject(error)
-          return resolve(file)
-        })
-    })
+          if (error) return reject(error);
+          return resolve(file);
+        });
+    });
   }
 
   /**
    * Convenience method to download a file into memory or to a local destination.
    * The file will be saved in the tmp directory.
-   * 
+   *
    * @method download
    * @async
-   * 
-   * @param {String} location 
-   * 
+   *
+   * @param {String} location
+   *
    * @returns {String} File path
    */
-  download (location) {
-    const dir = 'tmp'
-    const dest = `${dir}/${new Date().getTime()}-${location}`
-    
+  download(location) {
+    const rootDir = "tmp";
+
+    // Add support for a location containing folders
+    const paths = location.split("/");
+    const file = paths.pop();
+    const folders = paths.join("/");
+
+    const dir = `${rootDir}/${folders}`;
+    const dest = `${dir}/${file}`;
+
     // create dir if doesn't exists
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir)
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir);
 
     return new Promise((resolve, reject) => {
-      this.storage.bucket(this._bucket.pull()).file(location)
-        .download({ destination: dest }, (error) => {
-          if (error) return reject(error)
-          return resolve(dest)
-        })
-    })
+      this.storage
+        .bucket(this._bucket.pull())
+        .file(location)
+        .download({ destination: dest }, error => {
+          if (error) return reject(error);
+          return resolve(dest);
+        });
+    });
   }
 }
 
-module.exports = GoogleStorage
+module.exports = GoogleStorage;
